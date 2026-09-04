@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diseño de Subestaciones Eléctricas</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Google Fonts para una tipografía moderna -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Leaflet para el mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- Pantalla Principal -->
+    <div id="screen-main" class="screen active">
+        <h1>Diseño de Subestaciones Eléctricas</h1>
+        <p class="subtitle">Herramienta de análisis y cálculo para ingeniería eléctrica</p>
+        
+        <div class="menu-options">
+            <button class="btn" id="btn-instrucciones">
+                <span class="icon">📄</span> Instrucciones del Programa
+            </button>
+            <button class="btn btn-primary" id="btn-diseno">
+                <span class="icon">⚡</span> Iniciar Diseño de Subestación
+            </button>
+            <button class="btn" id="btn-proyectos">
+                <span class="icon">📁</span> Ver Proyectos Guardados
+            </button>
+            <button class="btn btn-danger" id="btn-salir">
+                <span class="icon">✖️</span> Salir del Programa
+            </button>
+        </div>
+    </div>
+
+    <!-- Pantalla de Instrucciones -->
+    <div id="screen-instructions" class="screen">
+        <button class="home-btn home-right" title="Volver al menú principal">🏠 Home</button>
+        <h2>Instrucciones del Programa</h2>
+        <div class="content-area" id="instrucciones-content">
+            <div class="loader">Cargando instrucciones...</div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Proyectos Guardados -->
+    <div id="screen-projects" class="screen">
+        <button class="home-btn home-right" title="Volver al menú principal">🏠 Home</button>
+        <h2>Proyectos Guardados</h2>
+        <div class="content-area" id="proyectos-content">
+            <div class="loader">Buscando proyectos...</div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Diseño (Asistente / Wizard) -->
+    <div id="screen-design" class="screen">
+        <button class="home-btn home-left" title="Volver al menú principal">🏠 Home</button>
+        
+        <!-- Fase 1: Proyectista -->
+        <div id="step_proyectista" class="form-step active content-area">
+            <h2>Fase 1: Datos del Proyectista</h2>
+            <div class="form-grid">
+                <div class="form-group"><label>Nombre</label><input type="text" name="nombre" required></div>
+                <div class="form-group"><label>Apellidos</label><input type="text" name="apellidos" required></div>
+                <div class="form-group full-width"><label>Correo Electrónico</label><input type="email" name="correo" required></div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary next-btn" data-next="step_ubicacion">Siguiente Paso ➔</button></div>
+        </div>
+
+        <!-- Fase 2: Ubicación -->
+        <div id="step_ubicacion" class="form-step content-area">
+            <h2>Fase 2: Ubicación de la Subestación</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Tipo de Instalación</label>
+                    <select name="tipo_instalacion" id="sel_tipo_instalacion">
+                        <option value="">Selecciona...</option>
+                        <option value="Interior">Interior</option>
+                        <option value="Exterior">Exterior</option>
+                    </select>
+                </div>
+                <div class="form-group" id="container_aislamiento" style="display:none;">
+                    <label>Medio Aislante</label>
+                    <select name="medio_aislante" id="sel_medio_aislante">
+                        <!-- Opciones dinámicas -->
+                    </select>
+                </div>
+                <div class="form-group full-width" id="container_aislamiento_otro" style="display:none;">
+                    <label>Especificar Otro Medio Aislante</label>
+                    <input type="text" name="aislamiento_otro">
+                </div>
+            </div>
+            
+            <div id="container_mapa" style="display:none; margin-top:20px;">
+                <p class="step-info">Selecciona el punto en el mapa para obtener coordenadas y clima (Aprox).</p>
+                <div id="map-container" style="height: 300px; border-radius:12px; margin-bottom:15px; z-index:1;"></div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Coordenadas (Lat, Lng)</label><input type="text" name="coordenadas" id="inp_coordenadas" readonly></div>
+                    <div class="form-group"><label>Altitud (m)</label><input type="text" name="altitud" id="inp_altitud" readonly></div>
+                    <div class="form-group full-width"><label>Condiciones Climáticas (Aprox)</label><input type="text" name="clima" id="inp_clima" readonly></div>
+                </div>
+                <div class="form-group full-width" id="container_entorno" style="display:none; margin-top:15px;">
+                    <label>Entorno</label>
+                    <select name="entorno">
+                        <option value="Urbana">Urbana</option>
+                        <option value="Rural">Rural</option>
+                        <option value="Montaña">Montaña</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions dual" style="margin-top:20px;">
+                <button class="btn prev-btn" data-prev="step_proyectista">🡄 Anterior</button>
+                <button class="btn btn-primary next-btn" data-next="step_categoria">Siguiente Paso ➔</button>
+            </div>
+        </div>
+
+        <!-- Fase 3: Disponibilidad y Categoría -->
+        <div id="step_categoria" class="form-step content-area">
+            <h2>Fase 3: Disponibilidad y Categoría</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Disponibilidad de Servicio</label>
+                    <select name="disponibilidad" id="sel_disponibilidad">
+                        <option value="Baja">Baja</option>
+                        <option value="Media">Media</option>
+                        <option value="Alta">Alta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Categoría de la Instalación</label>
+                    <select name="categoria" id="sel_categoria">
+                        <option value="TERCERA">Tercera (<= 30kV)</option>
+                        <option value="SEGUNDA">Segunda (<= 66kV)</option>
+                        <option value="PRIMERA">Primera (<= 132kV)</option>
+                        <option value="ESPECIAL">Especial (>= 220kV)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions dual" style="margin-top:20px;">
+                <button class="btn prev-btn" data-prev="step_ubicacion">🡄 Anterior</button>
+                <button class="btn btn-primary next-btn" data-next="step_parametros">Siguiente Paso ➔</button>
+            </div>
+        </div>
+
+        <!-- Fase 4: Función y Parámetros -->
+        <div id="step_parametros" class="form-step content-area">
+            <h2>Fase 4: Función y Parámetros</h2>
+            <div class="form-group full-width" style="margin-bottom:20px;">
+                <label>Función principal de la subestación</label>
+                <select name="funcion" id="sel_funcion">
+                    <option value="">Selecciona una función...</option>
+                    <option value="GENERACION">Generación</option>
+                    <option value="TRANSPORTE">Transporte</option>
+                    <option value="DISTRIBUCION">Distribución</option>
+                </select>
+            </div>
+
+            <!-- Contenedor Dinámico Generación -->
+            <div id="form_generacion" style="display:none;" class="sub-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tipo de Generación</label>
+                        <select name="gen_tipo" id="sel_gen_tipo">
+                            <option value="">Selecciona...</option>
+                            <option value="Síncrona o asíncrona">Síncrona o asíncrona</option>
+                            <option value="Estática">Estática</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Central</label>
+                        <select name="gen_central" id="sel_gen_central">
+                            <!-- Rellenado por JS -->
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Número de Generadores</label><input type="number" id="inp_gen_num_generadores" value="0" min="0"></div>
+                    <div class="form-group">
+                        <label>¿Trafos asociados a generadores?</label>
+                        <select id="sel_gen_trafos_asoc"><option value="No">No</option><option value="Si">Sí</option></select>
+                    </div>
+                    <div class="form-group"><label>Nº Trafos extra</label><input type="number" id="inp_gen_num_transformadores" value="0" min="0"></div>
+                    <div class="form-group"><label>Nº Posiciones de Línea</label><input type="number" id="inp_gen_num_lineas" class="inp-lineas" value="0" min="0"></div>
+                </div>
+
+                <div id="container_gen_generadores" style="margin-top: 15px;"></div>
+                <div id="container_gen_trafos_asoc" style="margin-top: 15px; display:none;"></div>
+                <div id="container_gen_trafos_extra" style="margin-top: 15px; display:none;"></div>
+                <div id="container_gen_lineas" style="margin-top: 15px;"></div>
+
+                <h3 class="sub-title">Conexión de Neutro General</h3>
+                <div class="form-grid">
+                    <div class="form-group"><label>Alta (Mayúsculas)</label>
+                        <select name="gen_neutro_alta"><option value="Y">Y</option><option value="YN">YN</option><option value="D">D</option><option value="Z">Z</option><option value="ZN">ZN</option></select>
+                    </div>
+                    <div class="form-group"><label>Baja/Gen (Minúsculas)</label>
+                        <select name="gen_neutro_baja"><option value="y">y</option><option value="yn">yn</option><option value="d">d</option><option value="z">z</option><option value="zn">zn</option></select>
+                    </div>
+                </div>
+
+                <h3 class="sub-title">Compensación de Reactiva</h3>
+                <div class="form-grid">
+                    <div class="form-group"><label>¿Existe?</label><select name="gen_reactiva"><option value="No">No</option><option value="Si">Sí</option></select></div>
+                    <div class="form-group"><label>Tecnología</label><input type="text" name="gen_reactiva_tec" placeholder="Ej: Condensadores..."></div>
+                </div>
+            </div>
+
+            <!-- Contenedor Dinámico Transporte / Distribución -->
+            <div id="form_trans_dist" style="display:none;" class="sub-form">
+                <div class="form-group full-width">
+                    <label>Tipo de Subestación</label>
+                    <select name="trans_tipo" id="sel_trans_tipo">
+                        <option value="">Selecciona...</option>
+                        <option value="Maniobra">Maniobra</option>
+                        <option value="Transformación">Transformación</option>
+                    </select>
+                </div>
+
+                <!-- Maniobra -->
+                <div id="form_trans_maniobra" style="display:none;">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nº Posiciones de Línea</label><input type="number" id="inp_trans_man_num_lineas" class="inp-lineas" value="0" min="0"></div>
+                    </div>
+                    <div id="container_trans_man_lineas" style="margin-top: 15px;"></div>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Compensación Reactiva</label><select name="trans_man_reactiva"><option value="No">No</option><option value="Si">Sí</option></select></div>
+                        <div class="form-group"><label>Tecnología Reactiva</label><input type="text" name="trans_man_reactiva_tec"></div>
+                    </div>
+                </div>
+
+                <!-- Transformación -->
+                <div id="form_trans_transformacion" style="display:none;">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Operación</label><select name="trans_trf_operacion"><option value="Elevadora">Elevadora</option><option value="Reductora">Reductora</option></select></div>
+                        <div class="form-group"><label>Nº Transformadores</label><input type="number" id="inp_trans_trf_num_trafos" value="0" min="0"></div>
+                        <div class="form-group"><label>Nº Posiciones de Línea</label><input type="number" id="inp_trans_trf_num_lineas" class="inp-lineas" value="0" min="0"></div>
+                    </div>
+                    
+                    <div id="container_trans_trf_trafos" style="margin-top: 15px;"></div>
+                    <div id="container_trans_trf_lineas" style="margin-top: 15px;"></div>
+                    <div class="error-msg" id="err_trans_trf" style="display:none; color:var(--danger); margin-bottom:15px; font-size:0.9rem;">Los primarios y secundarios no pueden coincidir.</div>
+                    
+                    <h3 class="sub-title">Conexión de Neutro General</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Alta (Mayúsculas)</label>
+                            <select name="trans_trf_neutro_alta"><option value="Y">Y</option><option value="YN">YN</option><option value="D">D</option><option value="Z">Z</option><option value="ZN">ZN</option></select>
+                        </div>
+                        <div class="form-group"><label>Baja (Minúsculas)</label>
+                            <select name="trans_trf_neutro_baja"><option value="y">y</option><option value="yn">yn</option><option value="d">d</option><option value="z">z</option><option value="zn">zn</option></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions dual" style="margin-top: 30px;">
+                <button class="btn prev-btn" data-prev="step_categoria">🡄 Anterior</button>
+                <button class="btn btn-primary" id="btn-to-esquemas" disabled>Validar y Ver Esquemas ➔</button>
+            </div>
+        </div>
+
+        <!-- Fase 5: Selección de Esquema -->
+        <div id="step_esquemas" class="form-step content-area">
+            <h2>Fase 5: Selección de Esquema</h2>
+            <p class="step-info">Esquemas recomendados según el cómputo de posiciones de línea y la función.</p>
+            
+            <div class="form-actions" style="margin-bottom: 20px; display: flex; justify-content: center; gap: 15px;">
+                <button class="btn" id="btn-ver-todos">Mostrar todos los esquemas posibles</button>
+                <button class="btn" id="btn-ver-recomendados" style="display:none;">Volver a Recomendados</button>
+            </div>
+
+            <div id="esquemas-container" class="esquemas-grid">
+                <!-- Se poblará con JS -->
+            </div>
+            
+            <div class="form-actions dual" style="margin-top: 30px;">
+                <button class="btn prev-btn" data-prev="step_parametros">🡄 Anterior</button>
+                <button class="btn btn-primary" id="btn-next-final" disabled>Generar Documentos y Guardar ➔</button>
+            </div>
+        </div>
+
+        <!-- Fase 6: Generación -->
+        <div id="step_generation" class="form-step content-area">
+            <h2>Generación de Documentos</h2>
+            <div id="generation-status" class="status-container">
+                <div class="loader">Generando Excel y PDF...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal de confirmación global -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Atención</h3>
+            <p id="modal-text">¿Seguro que deseas continuar?</p>
+            <div class="modal-buttons">
+                <button class="btn" id="modal-no">No, cancelar</button>
+                <button class="btn btn-danger" id="modal-yes">Sí, continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
