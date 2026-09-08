@@ -41,6 +41,12 @@ def get_instrucciones():
                 
     return jsonify({'text': "No se encontró ningún archivo de instrucciones en la carpeta 'Instrucciones'."})
 
+@app.route('/api/proyectos', methods=['GET'])
+def get_proyectos():
+    # En la versión cloud los proyectos no se almacenan en el servidor.
+    # Los archivos se descargan directamente al ordenador del usuario.
+    return jsonify({'proyectos': [], 'info': 'Versión en la nube: los proyectos se descargan directamente.'})
+
 @app.route('/api/tensiones', methods=['GET'])
 def get_tensiones():
     try:
