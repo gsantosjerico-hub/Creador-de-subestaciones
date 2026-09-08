@@ -1,0 +1,14 @@
+¡Bienvenido al Software de Diseño de Subestaciones!
+
+** Función del Programa **
+Este software tiene como objetivo facilitar a los ingenieros el diseño preliminar y el cálculo de parámetros de una subestación eléctrica de forma rápida e intuitiva. 
+
+** Instrucciones de Uso **
+1. En el menú principal, dirígete a "Iniciar Diseño de Subestación".
+2. Rellena los formularios con la información general de la estructura y la ubicación.
+3. Avanza e ingresa los parámetros eléctricos principales en la segunda etapa.
+4. El programa automáticamente recopilará los datos y generará un documento Excel y un reporte en PDF.
+5. Todos los proyectos se guardan automáticamente en la carpeta "Proyectos" con un nombre único basado en la fecha y hora de creación.
+
+---
+
