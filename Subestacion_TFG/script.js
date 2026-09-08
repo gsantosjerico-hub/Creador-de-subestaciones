@@ -105,7 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 `).join('');
             }
         } catch (e) {
-            area.innerHTML = '<div style="color: #ef4444; text-align:center;">Error al cargar proyectos.</div>';
+            area.innerHTML = `
+                <div style="text-align:center; padding: 40px; color: var(--text-muted);">
+                    <p style="font-size: 2rem;">☁️</p>
+                    <p style="margin-top: 10px;">En la versión en línea, los proyectos se descargan directamente a tu ordenador al finalizar cada diseño.</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">No se almacenan en el servidor.</p>
+                </div>`;
         }
     };
 
