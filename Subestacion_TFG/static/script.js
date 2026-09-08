@@ -91,13 +91,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             
             if (!data.proyectos || data.proyectos.length === 0) {
-                showModal('Sin Proyectos', 'No se encontraron proyectos.', () => showScreen('screen-main'));
-                area.innerHTML = '<p style="text-align:center; color:#94a3b8;">No hay proyectos.</p>';
+                area.innerHTML = `
+                    <div style="text-align:center; padding: 40px; color: var(--text-muted);">
+                        <p style="font-size: 2rem;">☁️</p>
+                        <p style="margin-top: 10px;">En la versión en línea, los proyectos se descargan directamente a tu ordenador al finalizar cada diseño.</p>
+                        <p style="margin-top: 10px; font-size: 0.9rem;">No se almacenan en el servidor.</p>
+                    </div>`;
             } else {
                 area.innerHTML = data.proyectos.map(p => `
                     <div class="project-item">
                         <div><h3>📄 ${p}</h3></div>
-                        <a href="/descargar/${p}/reporte_subestacion.pdf" class="btn" target="_blank" style="padding: 8px 16px; font-size: 0.9rem;">Ver PDF</a>
                     </div>
                 `).join('');
             }
