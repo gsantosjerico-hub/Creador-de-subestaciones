@@ -11,6 +11,4 @@ Este software tiene como objetivo facilitar a los ingenieros el diseño prelimin
 5. Todos los proyectos se guardan automáticamente en la carpeta "Proyectos" con un nombre único basado en la fecha y hora de creación.
 
 ---
-*Nota para la versión Beta*: 
-Actualmente el programa lee este texto desde el archivo de texto en la carpeta "Instrucciones". Si creas un documento de Microsoft Word (.docx) y lo guardas en la misma carpeta "Instrucciones", el programa dará prioridad al archivo Word y leerá el texto directamente de él sin que tengas que modificar nada del código.
 
